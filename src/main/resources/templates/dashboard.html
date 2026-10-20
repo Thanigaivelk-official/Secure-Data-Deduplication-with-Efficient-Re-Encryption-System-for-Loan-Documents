@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Dashboard - Secure Loan Document Portal</title>
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Animate.css for smooth entrance transitions -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --card-border: rgba(226, 232, 240, 0.8);
+            --header-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: #1e293b;
+        }
+
+        /* Top Navbar */
+        .navbar-custom {
+            background: var(--header-gradient);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        .brand-logo {
+            transition: transform 0.3s ease;
+        }
+        .brand-logo:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        /* Metric Cards with gradient hover & glow */
+        .metric-card {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid var(--card-border);
+            padding: 22px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+        .metric-card-primary::after { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .metric-card-info::after { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+        .metric-card-success::after { background: linear-gradient(90deg, #059669, #34d399); }
+        .metric-card-warning::after { background: linear-gradient(90deg, #d97706, #fbbf24); }
+
+        .metric-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+        }
+        .metric-icon-bg {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover .metric-icon-bg {
+            transform: scale(1.15) rotate(6deg);
+        }
+
+        /* Custom Modern Tables */
+        .card-table {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+        .table thead th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s ease;
+        }
+        .table-hover tbody tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        /* Animated Badges & Status */
+        .badge-pill-custom {
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+        .badge-pill-custom:hover {
+            transform: scale(1.05);
+        }
+
+        /* Reusable Pulse Animations */
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            background-color: #10b981;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulseGreen 2s infinite;
+        }
+        @keyframes pulseGreen {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .pulse-dedup {
+            background: linear-gradient(135deg, #2563eb, #6366f1);
+            color: white;
+            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+            animation: pulseDedup 3s infinite;
+        }
+        @keyframes pulseDedup {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<!-- Top Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4 py-3 sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white d-flex align-items-center brand-logo" href="/dashboard">
+            <div class="p-2 bg-primary rounded-3 me-2 d-flex align-items-center justify-content-center shadow-sm">
+                <i class="bi bi-shield-lock-fill text-white fs-4"></i>
+            </div>
+            <div>
+                <span class="fw-bold fs-5 tracking-tight">SecureDoc Cloud</span>
+                <span class="d-block text-white-50" style="font-size: 0.68rem; letter-spacing: 0.5px;">DEDUPLICATION &amp; RE-ENCRYPTION</span>
+            </div>
+        </a>
+
+        <div class="d-flex align-items-center">
+            <div class="me-3 text-end d-none d-md-block">
+                <span class="text-white fw-bold d-block" style="font-size: 0.9rem;" th:text="${user.fullName}">User Full Name</span>
+                <small class="text-white-50 font-monospace" th:text="${'@' + user.username}">@username</small>
+            </div>
+            <span class="badge bg-primary text-uppercase me-3 px-3 py-2 shadow-sm rounded-pill" th:text="${role}">ROLE</span>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-light btn-sm btn-action px-3 py-1.5"><i class="bi bi-box-arrow-right me-1"></i> Sign Out</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4 py-4">
+
+    <!-- Flash Status Alert -->
+    <div id="statusAlert" class="alert d-none alert-dismissible fade show animate__animated animate__fadeInDown rounded-4 shadow-sm" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-info-circle-fill fs-4 me-2"></i>
+            <span id="statusAlertText" class="fw-semibold"></span>
+        </div>
+        <button type="button" class="btn-close" onclick="document.getElementById('statusAlert').classList.add('d-none')"></button>
+    </div>
+
+    <!-- Storage & Deduplication Metrics Cards -->
+    <div class="row g-3 mb-4">
+        <!-- 1. Logical Uploads -->
+        <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.05s;">
+            <div class="metric-card metric-card-primary h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted small text-uppercase fw-bold mb-1">Logical Uploads</div>
+                        <div class="fs-3 fw-bold text-dark" th:text="${analytics.totalLogicalDocuments} + ' Files'">0 Files</div>
+                        <div class="text-primary fw-semibold small mt-1">
+                            <i class="bi bi-file-earmark-text me-1"></i>
+                            <span th:text="${#numbers.formatDecimal(analytics.logicalStorageBytes / 1024.0, 1, 1)} + ' KB total volume'">0 KB</span>
+                        </div>
+                    </div>
+                    <div class="metric-icon-bg bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-cloud-arrow-up-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Physical Ciphertext Stored -->
+        <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+            <div class="metric-card metric-card-info h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted small text-uppercase fw-bold mb-1">Physical Ciphertext Stored</div>
+                        <div class="fs-3 fw-bold text-info" th:text="${analytics.uniquePhysicalObjects} + ' Objects'">0 Objects</div>
+                        <div class="text-secondary fw-semibold small mt-1">
+                            <i class="bi bi-shield-shaded me-1"></i>
+                            <span th:text="${#numbers.formatDecimal(analytics.physicalStorageBytes / 1024.0, 1, 1)} + ' KB encrypted disk size'">0 KB</span>
+                        </div>
+                    </div>
+                    <div class="metric-icon-bg bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-hdd-network-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Physical Storage Saved -->
+        <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.15s;">
+            <div class="metric-card metric-card-success h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted small text-uppercase fw-bold mb-1">Physical Disk Saved</div>
+                        <div class="fs-3 fw-bold text-success" th:text="${#numbers.formatDecimal(analytics.storageSavedBytes / 1024.0, 1, 1)} + ' KB'">0 KB</div>
+                        <div class="text-success fw-semibold small mt-1">
+                            <i class="bi bi-check-circle-fill me-1"></i> Deduplication active
+                        </div>
+                    </div>
+                    <div class="metric-icon-bg bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-pie-chart-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Deduplication Ratio -->
+        <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+            <div class="metric-card metric-card-warning h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted small text-uppercase fw-bold mb-1">Deduplication Ratio</div>
+                        <div class="fs-3 fw-bold text-warning" th:text="${analytics.deduplicationRatio} + ' %'">0 %</div>
+                        <div class="text-muted small mt-1">
+                            <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Efficiency Index
+                        </div>
+                    </div>
+                    <div class="metric-icon-bg bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-intersect"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Toolbar Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 animate__animated animate__fadeIn">
+        <div class="d-flex align-items-center">
+            <h5 class="fw-bold text-dark m-0 d-flex align-items-center">
+                <i class="bi bi-file-earmark-lock-fill text-primary me-2 fs-4"></i>
+                Encrypted Loan Documents
+            </h5>
+            <span class="ms-3 badge bg-light text-secondary border rounded-pill px-3 py-1.5 small">
+                <span class="pulse-dot me-1"></span> AES-256-GCM AEAD Storage
+            </span>
+        </div>
+        <div>
+            <button th:if="${role == 'CUSTOMER' || role == 'ADMIN'}" class="btn btn-outline-primary btn-action me-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#createLoanModal">
+                <i class="bi bi-plus-circle me-1"></i> New Loan Application
+            </button>
+            <button class="btn btn-primary btn-action fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#uploadDocModal">
+                <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Loan Document
+            </button>
+        </div>
+    </div>
+
+    <!-- Documents Data Table -->
+    <div class="card card-table mb-4 animate__animated animate__fadeInUp">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Document &amp; Identifier</th>
+                        <th>Document Category</th>
+                        <th>Associated Loan</th>
+                        <th>Logical Size</th>
+                        <th>Encryption Primitive</th>
+                        <th>Deduplication Engine</th>
+                        <th>Uploaded At</th>
+                        <th class="text-end">Authorized Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(documents)}">
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-folder2-open fs-1 text-muted d-block mb-2"></i>
+                            No loan documents uploaded yet. Upload a document to observe AES encryption and deduplication.
+                        </td>
+                    </tr>
+                    <tr th:each="doc : ${documents}">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="p-2 bg-danger bg-opacity-10 text-danger rounded-3 me-2">
+                                    <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" th:text="${doc.originalFilename}">filename.pdf</div>
+                                    <small class="text-muted font-monospace" th:text="${doc.documentUuid}">uuid</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary badge-pill-custom" th:text="${doc.documentType}">SALARY_SLIP</span>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-primary" th:text="${doc.loan.applicationNumber}">LN-123</div>
+                            <small class="text-muted" th:text="${doc.loan.loanType}">Type</small>
+                        </td>
+                        <td class="fw-semibold text-secondary" th:text="${#numbers.formatDecimal(doc.logicalSizeBytes / 1024.0, 1, 1)} + ' KB'">12 KB</td>
+                        <td>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 badge-pill-custom">
+                                <i class="bi bi-shield-check"></i> AES-256-GCM
+                            </span>
+                        </td>
+                        <td>
+                            <!-- Deduplication indicator -->
+                            <div th:if="${doc.versions[0].storageObject.referenceCount > 1}">
+                                <span class="badge pulse-dedup badge-pill-custom">
+                                    <i class="bi bi-intersect"></i> Deduplicated (<span th:text="${doc.versions[0].storageObject.referenceCount}">2</span> refs)
+                                </span>
+                                <small class="text-success d-block fw-semibold" style="font-size: 0.7rem;">0 KB Duplicate Storage</small>
+                            </div>
+                            <div th:unless="${doc.versions[0].storageObject.referenceCount > 1}">
+                                <span class="badge bg-light text-muted border badge-pill-custom">
+                                    <i class="bi bi-check2"></i> Unique Object
+                                </span>
+                            </div>
+                        </td>
+                        <td class="small text-muted" th:text="${#temporals.format(doc.createdAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+                        <td class="text-end">
+                            <a th:href="@{'/api/documents/' + ${doc.documentUuid} + '/download'}" class="btn btn-sm btn-outline-primary btn-action me-1" title="Download & Authenticated Decrypt">
+                                <i class="bi bi-download"></i>
+                            </a>
+                            <button th:if="${role == 'ADMIN' || role == 'OFFICER'}" class="btn btn-sm btn-outline-warning btn-action me-1 btn-reencrypt" 
+                                    th:data-uuid="${doc.documentUuid}" title="Trigger Re-Encryption / Key Rotation">
+                                <i class="bi bi-arrow-repeat"></i> Re-encrypt
+                            </button>
+                            <button th:if="${role == 'ADMIN' || role == 'OFFICER'}" class="btn btn-sm btn-outline-secondary btn-action btn-share"
+                                    th:data-uuid="${doc.documentUuid}" title="Share Document Access">
+                                <i class="bi bi-share-fill"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Loan Applications & Audit Log Grid -->
+    <div class="row g-4">
+        <!-- Loans Overview -->
+        <div class="col-lg-6 animate__animated animate__fadeInLeft">
+            <div class="card card-table h-100">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold m-0 text-dark"><i class="bi bi-folder-check me-2 text-primary"></i>Loan Applications Overview</h6>
+                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1 small" th:text="${#lists.size(loans)} + ' Applications'">0 Applications</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Application No</th>
+                                    <th>Applicant</th>
+                                    <th>Requested / Approved</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(loans)}">
+                                    <td colspan="4" class="text-center text-muted py-4">No loan applications active.</td>
+                                </tr>
+                                <tr th:each="loan : ${loans}">
+                                    <td>
+                                        <b class="text-dark" th:text="${loan.applicationNumber}">LN-123</b>
+                                        <div class="small text-muted" th:text="${loan.loanType + ' • ' + loan.tenureMonths + ' Mo'}">Type</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold text-dark" th:text="${loan.applicant.fullName}">Name</div>
+                                        <small class="text-muted font-monospace" th:text="${loan.applicant.email}">email</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark" th:text="'$' + ${loan.requestedAmount}">$0</div>
+                                        <small th:if="${loan.approvedAmount != null}" class="text-success fw-semibold" th:text="'Appr: $' + ${loan.approvedAmount}">Appr</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 badge-pill-custom" th:text="${loan.status}">SUBMITTED</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Immutable Audit Trail -->
+        <div class="col-lg-6 animate__animated animate__fadeInRight">
+            <div class="card card-table h-100">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold m-0 text-dark"><i class="bi bi-shield-shaded me-2 text-danger"></i>Immutable Security Audit Log</h6>
+                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-1 small">Real-Time Security Trail</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
+                        <table class="table table-sm table-hover align-middle mb-0 font-monospace small">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Action</th>
+                                    <th>Actor</th>
+                                    <th>Target Entity</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(auditLogs)}">
+                                    <td colspan="5" class="text-center text-muted py-4">No audit events recorded yet.</td>
+                                </tr>
+                                <tr th:each="log : ${auditLogs}">
+                                    <td class="text-muted" th:text="${#temporals.format(log.timestamp, 'HH:mm:ss')}">Time</td>
+                                    <td><b class="text-dark" th:text="${log.action}">ACTION</b></td>
+                                    <td th:text="${log.actor != null ? log.actor.username : 'SYSTEM'}">Actor</td>
+                                    <td th:text="${log.targetEntity + ':' + (log.targetId != null ? #strings.abbreviate(log.targetId, 12) : '')}">Target</td>
+                                    <td>
+                                        <span th:class="${log.status == 'SUCCESS' ? 'badge bg-success bg-opacity-10 text-success' : 'badge bg-danger bg-opacity-10 text-danger'}" th:text="${log.status}">SUCCESS</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Upload Document -->
+<div class="modal fade" id="uploadDocModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <form id="uploadDocForm" enctype="multipart/form-data">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark">Upload Encrypted Document</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Select Loan Application</label>
+                        <select id="uploadLoanId" class="form-select rounded-3" required>
+                            <option th:each="l : ${loans}" th:value="${l.id}" th:text="${l.applicationNumber + ' (' + l.loanType + ' - ' + l.applicant.fullName + ')'}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Document Category</label>
+                        <select id="uploadDocType" class="form-select rounded-3" required>
+                            <option value="SALARY_SLIP">Salary Slip / Income Proof</option>
+                            <option value="IDENTITY_PROOF">Identity Proof (Passport / Aadhaar / Driver's License)</option>
+                            <option value="BANK_STATEMENT">Bank Official Statement</option>
+                            <option value="ADDRESS_PROOF">Utility Bill / Address Proof</option>
+                            <option value="PROPERTY_DOCUMENT">Society NOC / Property Deed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Select File (PDF, PNG, JPG, DOCX)</label>
+                        <input type="file" id="uploadFile" class="form-control rounded-3" required>
+                        <div class="form-text small mt-1">
+                            <i class="bi bi-shield-lock-fill text-primary me-1"></i> Pre-encryption canonical SHA-256 fingerprinting verifies deduplication before AES-256-GCM write.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-3 px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold shadow-sm">
+                        <i class="bi bi-lock-fill me-1"></i> Encrypt &amp; Upload
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Create Loan Application -->
+<div class="modal fade" id="createLoanModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <form id="createLoanForm">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark">Submit New Loan Application</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Loan Type</label>
+                        <select id="loanType" class="form-select rounded-3" required>
+                            <option value="HOME_LOAN">Home Mortgage Loan</option>
+                            <option value="PERSONAL_LOAN">Personal Express Loan</option>
+                            <option value="BUSINESS_LOAN">Commercial Business Loan</option>
+                            <option value="VEHICLE_LOAN">Auto / Vehicle Loan</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Requested Loan Amount ($)</label>
+                        <input type="number" id="requestedAmount" class="form-control rounded-3" min="500" step="100" placeholder="75000" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Tenure (Months)</label>
+                        <input type="number" id="tenureMonths" class="form-control rounded-3" min="6" max="360" value="48" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-3 px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold shadow-sm">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Share Document -->
+<div class="modal fade" id="shareDocModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <form id="shareDocForm">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark">Grant Document Access</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="shareDocUuid">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Target User ID (e.g., 2 for Officer Sarah, 4 for John, 5 for Alice)</label>
+                        <input type="number" id="targetUserId" class="form-control rounded-3" value="2" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Permission Level</label>
+                        <select id="permissionType" class="form-select rounded-3">
+                            <option value="DOWNLOAD">Download &amp; Authenticated Decrypt</option>
+                            <option value="VIEW">View Metadata Only</option>
+                            <option value="MANAGE">Full Manage</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-3 px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold shadow-sm">Grant Access</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function showNotification(msg, isSuccess = true) {
+    const alertBox = document.getElementById('statusAlert');
+    const alertText = document.getElementById('statusAlertText');
+    alertBox.className = 'alert alert-dismissible fade show ' + (isSuccess ? 'alert-success' : 'alert-danger');
+    alertText.innerHTML = msg;
+    alertBox.classList.remove('d-none');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Event delegation for reencrypt and share buttons
+document.addEventListener('click', (e) => {
+    const reencBtn = e.target.closest('.btn-reencrypt');
+    if (reencBtn) {
+        const uuid = reencBtn.getAttribute('data-uuid');
+        if (uuid) reencryptDoc(uuid);
+        return;
+    }
+
+    const shareBtn = e.target.closest('.btn-share');
+    if (shareBtn) {
+        const uuid = shareBtn.getAttribute('data-uuid');
+        if (uuid) openShareModal(uuid);
+        return;
+    }
+});
+
+// Upload form handler
+document.getElementById('uploadDocForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const loanId = document.getElementById('uploadLoanId').value;
+    const docType = document.getElementById('uploadDocType').value;
+    const file = document.getElementById('uploadFile').files[0];
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('documentType', docType);
+
+    try {
+        const res = await fetch(`/api/loans/${loanId}/documents`, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('uploadDocModal')).hide();
+            showNotification(`<b>${data.message}</b>`);
+            setTimeout(() => window.location.reload(), 1400);
+        } else {
+            alert('Upload failed: ' + data.message);
+        }
+    } catch (err) {
+        alert('Server communication error during file upload');
+    }
+});
+
+// Loan application handler
+const createLoanForm = document.getElementById('createLoanForm');
+if (createLoanForm) {
+    createLoanForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            loanType: document.getElementById('loanType').value,
+            requestedAmount: parseFloat(document.getElementById('requestedAmount').value),
+            tenureMonths: parseInt(document.getElementById('tenureMonths').value)
+        };
+        try {
+            const res = await fetch('/api/loans', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                bootstrap.Modal.getInstance(document.getElementById('createLoanModal')).hide();
+                showNotification('Loan application submitted successfully!');
+                setTimeout(() => window.location.reload(), 1400);
+            } else {
+                alert('Loan creation failed: ' + data.message);
+            }
+        } catch (err) {
+            alert('Error creating loan application');
+        }
+    });
+}
+
+// Share form handler
+document.getElementById('shareDocForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const uuid = document.getElementById('shareDocUuid').value;
+    const targetUserId = document.getElementById('targetUserId').value;
+    const permission = document.getElementById('permissionType').value;
+
+    try {
+        const res = await fetch(`/api/documents/${uuid}/share?targetUserId=${targetUserId}&permissionType=${permission}`, {
+            method: 'POST'
+        });
+        const data = await res.json();
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('shareDocModal')).hide();
+            showNotification(`<b>Access Granted:</b> Document shared with User ID ${targetUserId}!`);
+            setTimeout(() => window.location.reload(), 1400);
+        } else {
+            alert('Share failed: ' + data.message);
+        }
+    } catch (err) {
+        alert('Sharing request failed');
+    }
+});
+
+// Re-encryption handler
+async function reencryptDoc(documentUuid) {
+    if (!confirm('Initiate key rotation & full re-encryption for this document under a newly generated AES-256 DEK?')) return;
+    try {
+        const res = await fetch(`/api/documents/${documentUuid}/reencrypt`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            showNotification(`<b>Re-Encryption Succeeded:</b> Storage ciphertext rotated to new key version!`);
+            setTimeout(() => window.location.reload(), 1400);
+        } else {
+            alert('Re-encryption error: ' + data.message);
+        }
+    } catch (err) {
+        alert('Re-encryption call failed');
+    }
+}
+</script>
+
+</body>
+</html>
